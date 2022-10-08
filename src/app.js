@@ -6,6 +6,9 @@ const app = express()
 app.use(cors())
 const bodyparser = require("body-parser")
 app.use(bodyparser())
+
+app.use(bodyparser.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 }))
+app.use(bodyparser.json({ limit: "50mb" }))
 const multer = require("multer")
 
 

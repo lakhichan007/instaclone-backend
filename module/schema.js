@@ -1,7 +1,7 @@
 const mongoose= require("mongoose")
 
 // mongoose.connect("")
-mongoose.connect("mongodb+srv://lakhichan007:12345@cluster0.gcqitot.mongodb.net/Instadb?retryWrites=true&w=majority")
+mongoose.connect("mongodb+srv://lakhichan007:12345@cluster0.9vdu0wz.mongodb.net/?retryWrites=true&w=majority")
 .then(()=>{
     console.log("Sucessfully connected with Database")
 })
