@@ -1,31 +1,46 @@
 const express = require("express")
 const cors = require('cors')
-const fs = require("fs")
 let InstaUser = require("../module/schema")
 const app = express()
 app.use(cors())
 const bodyparser = require("body-parser")
 app.use(bodyparser())
 
-app.use(bodyparser.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 }))
-app.use(bodyparser.json({ limit: "50mb" }))
-const multer = require("multer")
-
-
 let port = process.env.PORT || 8000
-app.use(express.static("public"))
 
-//use of the multer
-const storagefile = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, "uploads")
-    },
-    filename: (req, file, cb) => {
-        cb(null,`image-${Date.now()}.${file.originalname}`)
-    }
+const fileupload = require("express-fileupload")
+var cloudinary = require("cloudinary").v2;
+app.use(fileupload({
+    useTempFiles: true
+}))
+
+cloudinary.config({
+    cloud_name: "dxfkj6qru",
+    api_key: "671759823811938",
+    api_secret: "mz5yIRM--5-NYzSgcYSZs_pUG0w",
+    secure: true
 })
-const upload = multer({ storage: storagefile })
 
+app.post("/user/upload",async(req, res) => {
+    try{
+        const file = req.files.image
+       await cloudinary.uploader.upload(file.tempFilePath,(err,result)=>{
+           InstaUser.create({
+                name:req.body.name,
+                image:result.url,
+                location:req.body.location,
+                description:req.body.description
+            })
+        })
+
+        res.send("data uploaded sucessfully")
+       
+    }
+    catch(err){
+        console.log(err)
+    }
+
+})
 
 app.get("/user", async (req, res) => {
     try {
@@ -33,30 +48,13 @@ app.get("/user", async (req, res) => {
         res.json({
             profile
         })
+        console.log(profile)
     }
     catch (e) {
         console.log(e)
     }
 })
 
-app.post("/user/upload", upload.single("image"), (req, res) => {
-    const saveData = InstaUser({
-        name: req.body.name,
-        description: req.body.description,
-        location: req.body.location,
-        img: {
-            data: fs.readFileSync("uploads/" + req.file.filename),
-            contentType: "image/png"
-        },
-    })
-    saveData
-        .save()
-        .then((res) => { "" })
-        .catch((err) => {
-            console.log(err)
-        })
-        res.send("Data updated sucessfully!")
-})
 app.listen(port, () => {
     console.log(`server runnin at ${port}`)
 })

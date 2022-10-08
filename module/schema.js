@@ -11,7 +11,7 @@ mongoose.connect("mongodb+srv://lakhichan007:12345@cluster0.9vdu0wz.mongodb.net/
 
 const schema = mongoose.Schema
 const userSchema= new schema({
-    img:{data:Buffer,contentType:String},
+    image:{type:String},
     name:{type:String,required:true},
     location:{type:String,required:true},
     description:{type:String}
